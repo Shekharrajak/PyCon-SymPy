@@ -4,7 +4,7 @@ PyCon India -  SymPy & SymEngine
 
 * Proposal Link: [Symbolic computation with Python](#)
 
-* Website Link: --
+* Website Link: [pycon_2017](https://shekharrajak.github.io/PyCon-SymPy-SymEngine/)
 
 ## About SymPy & SymEngine
 
