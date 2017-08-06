@@ -99,11 +99,11 @@ SymEngine and its Python wrapper can be installed directly through:
 
 Other alternative installation instructions can be found at:
 
-`https://github.com/symengine/symengine/wiki/Building-SymEngine`
-`https://github.com/symengine/symengine.py/`
-`https://github.com/symengine/symengine.rb/`
-`https://github.com/symengine/symengine.jl/`
-`https://github.com/symengine/symengine.hs/`
+- `https://github.com/symengine/symengine/wiki/Building-SymEngine`
+- `https://github.com/symengine/symengine.py/`
+- `https://github.com/symengine/symengine.rb/`
+- `https://github.com/symengine/symengine.jl/`
+- `https://github.com/symengine/symengine.hs/`
 
 SymPy team has developed and delivered many talks and tutorials at SciPy and other conferences. 
 We are constantly building on new content and improving the present at the same time. 
@@ -113,6 +113,8 @@ Note: that the notebooks are hosted statically, you can download from here and r
 
 SymPy India developers will be conducting the workshop: 
 
-* [Shekhar Prasad Rajak](https://github.com/Shekharrajak) : NIT Warangal | Core Developer at SymPy GSoC 2016 | Solvers, Sets
-* [Shikhar Jaiswal](https://github.com/ShikharJ) : IIT Patna | Student Developer at SymPy GSoC 2017 | SymPy - SymEngine Integration and Python Wrappers
+* [Shekhar Prasad Rajak](https://github.com/Shekharrajak) : NIT Warangal | Core Developer at SymPy GSoC 2016 | Solvers, Sets <br>
+* [Shikhar Jaiswal](https://github.com/ShikharJ) : IIT Patna | Student Developer at SymPy GSoC 2017 | SymPy - SymEngine Integration and Python Wrappers <br>
+* [Ranjith Kumar](https://github.com/ranjithkumar007) : IIT Kharagpur | Student Developer at SymPy GSoC 2017 | Solvers and Sets in SymEngine <br>
+
 TODO: add name here
