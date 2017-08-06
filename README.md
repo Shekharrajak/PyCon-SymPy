@@ -4,7 +4,9 @@ PyCon India -  SymPy & SymEngine
 
 * Proposal Link: [SymPy, Symengine and it's wrapper for different programming languages as computer aided algebra system (CAS)](https://in.pycon.org/cfp/2017/proposals/sympy-symengine-and-its-wrapper-for-different-programming-languages-as-computer-aided-algebra-system-cas~eXnob/)
 
-* Website Link: [pycon_2017](https://shekharrajak.github.io/PyCon-SymPy-SymEngine/)
+* Website Link: [Pycon_india_2017](https://shekharrajak.github.io/PyCon-SymPy-SymEngine/)
+
+* [In sympy/wiki](https://github.com/sympy/sympy/wiki/PyCon-India-2017-Proposal) 
 
 ## About SymPy & SymEngine
 
