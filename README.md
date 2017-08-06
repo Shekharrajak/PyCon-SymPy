@@ -96,7 +96,7 @@ We expect attendees of this tutorial to have basic knowledge of Python, C++, Rub
        Recursing through an Expression Tree
 
 
-We recommend that the attendees install the Anaconda Python distribution which includes SymPy, NumPy, and IPython. Once Anaconda is installed simply type the following in a terminal to install the necessary packages:
+The tutorial will only assume a basic knowledge of Python and C++. No prior knowledge of SymPy or other Python libraries is required, although it is suggested that attendees be familiar with the IPython notebook. A mathematical knowledge of calculus is recommended.
 
 `$ conda install numpy ipython-notebook sympy`
 
@@ -127,4 +127,3 @@ SymPy India developers will be conducting the workshop:
 * [Shekhar Prasad Rajak](https://github.com/Shekharrajak) : NIT Warangal | Core Developer at SymPy GSoC 2016 | Solvers, Sets <br>
 * [Shikhar Jaiswal](https://github.com/ShikharJ) : IIT Patna | Student Developer at SymPy GSoC 2017 | SymPy - SymEngine Integration and Python Wrappers <br>
 * [Ranjith Kumar](https://github.com/ranjithkumar007) : IIT Kharagpur | Student Developer at SymPy GSoC 2017 | Solvers and Sets in SymEngine <br>
-
