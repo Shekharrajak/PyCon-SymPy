@@ -10,33 +10,9 @@ PyCon India -  SymPy & SymEngine
 
 SymPy is a pure Python library for symbolic mathematics. It aims to become a full-featured computer algebra system (CAS) while keeping the code as simple as possible in order to be comprehensible and easily extensible. SymPy is written entirely in Python and does not require any external library.
 
-SymEngine is a standalone fast C++ symbolic manipulation library. Optional thin wrappers allow usage of the library from other languages
+SymEngine is a standalone fast C++ symbolic manipulation library. Optional thin wrappers allow usage of the library from other languages.
 
-## SymPy & SymEngine Tutorial for PyCon India 2017
-
-**SymPy** is a pure Python library for symbolic mathematics. It aims to become a full-featured computer algebra system (CAS) while keeping the code as simple as possible in order to be comprehensible and easily extensible. SymPy is written entirely in Python and does not require any external libraries.
-
-This tutorial is intended to cover the basics as well as touch on more advanced topics. We will start by showing how to install and configure this Python module. Then we will proceed to the basics of constructing and manipulating mathematical expressions in SymPy. We will also discuss the most common issues and differences from other computer algebra systems, and how to deal with them. In the remaining part of this tutorial we will show how to solve mathematical problems with SymPy.
-
-This knowledge should be enough for attendees to start using SymPy for solving mathematical problems and hacking SymPy's internals (though hacking core modules may require additional expertise).
-
-**SymEngine** is a standalone fast C++ symbolic manipulation library. Optional thin wrappers allow usage of the library from other languages (Python, Ruby, Julia, Haskell).
-
-The workshop will also include a hands-on introduction to SymEngine in Python for the advantages of speed while using SymPy. This section would focus heavily on SymEngine's Python wrapper called SymEngine.py, and the various methodologies employed by it, the use of Cython, an account of the modules currently supporting the use of SymEngine, the subsequent impact on performance and the major projects using SymEngine. In addition to the above, there will also be a light introduction towards installation and usage of SymEngine library in Ruby, Haskell and Julia, through their respective wrappers.
-
-We expect attendees of this tutorial to have basic knowledge of Python, C++, Ruby, Julia and mathematics. However, many more advanced topics for SymPy will be explained during presentation and basic examples for SymEngine wrappers.
-
-
-## Speaker Info
-
-TODO: Add names
-
-SymPy India developers will be conducting the workshop:
-
-* [name](https://github.com/name) : Desc | Core Developer at SymPy GSoC Year | Module
-
-
-## Proposal (will modify it and use it for pycon):
+## Proposal 
 
 **SymPy** is a pure Python library for symbolic mathematics. It aims to become a full-featured computer algebra system (CAS) while keeping the code as simple as possible in order to be comprehensible and easily extensible. SymPy is written entirely in Python and does not require any external libraries.
 
