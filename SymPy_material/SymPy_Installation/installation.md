@@ -58,3 +58,11 @@ The tutorial will only assume a basic knowledge of Python. No prior knowledge of
 
 **If audience are facing problem in installing the ipython or sympy, they can use online tool [http://live.sympy.org/](http://live.sympy.org/)**
 
+
+### Github repo Installation :
+
+To get the git repository, use: git clone git://github.com/sympy/sympy.git. This can be run locally using ./bin/isympy. To install globally, follow the instructions in the README file.
+
+And you can also access the git repository on the web: https://github.com/sympy/sympy
+
+
