@@ -1,3 +1,5 @@
+### Installation
+
 You can install SymEngine.jl by giving the following command.
 
 ```

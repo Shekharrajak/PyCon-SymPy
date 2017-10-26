@@ -1,4 +1,3 @@
-
 ### [Stack](http://docs.haskellstack.org/en/stable/README/), a Haskell build tool
 
 Stack is a Haskell build tool, which allows for cross-platform, reproducible builds.
