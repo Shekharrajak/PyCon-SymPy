@@ -1,0 +1,26 @@
+SymPy Tutorial for PyCon 2017
+=============================
+
+This is the tutorial will be presented at PyCon India 2015 by SymPy India
+for `SymPy <http://sympy.org>`_.  This is just a stripped down
+version of our `docs <http://docs.sympy.org>`_. It requires SymPy 0.7.6, and
+should work in Python 2.6, 2.7, 3.2., 3.3, or 3.4.  If you are attending this
+tutorial, please install Anaconda.
+
+
+See also `Last Year's SciPy tutorial
+<http://asmeurer.github.io/scipy-2014-tutorial/html/index.html>`_.
+
+.. toctree::
+   :maxdepth: 2
+
+   install.rst
+   tutorial/index.rst
+   gotchas.rst
+   aboutus.rst
+   introduction.rst
+   mathematics.rst
+   extras.rst
+
+
+.. _please report it: https://github.com/sympy/sympy/issues

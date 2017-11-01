@@ -1,0 +1,414 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Summing roots of polynomials &#8212; PyCon 2015 SymPy Tutorial  documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://live.sympy.org/static/live-core.css" type="text/css" />
+    <link rel="stylesheet" href="http://live.sympy.org/static/live-autocomplete.css" type="text/css" />
+    <link rel="stylesheet" href="http://live.sympy.org/static/live-sphinx.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/utilities.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/external/classy.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/live-core.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/live-autocomplete.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/live-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/SymPy-Favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Applications of |groebner| bases" href="groebner.html" />
+    <link rel="prev" title="Not only symbolics: numerical computing" href="numerics.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="summing-roots-of-polynomials">
+<h1>Summing roots of polynomials<a class="headerlink" href="#summing-roots-of-polynomials" title="Permalink to this headline">¶</a></h1>
+<p>Let’s suppose we are given a univariate polynomial <span class="math">\(f(z)\)</span> and a univariate
+rational function <span class="math">\(g(z)\)</span>, and we wish to compute:</p>
+<div class="math">
+\[g(r_1) + g(r_2) + \ldots + g(r_n)\]</div>
+<p>where <span class="math">\(r_i\)</span> for <span class="math">\(i = 1 \ldots n\)</span> are the roots of <span class="math">\(f\)</span> (i.e. <span class="math">\(f(r_i) = 0\)</span>).</p>
+<p>In theory this is a very simple task. We just have to compute roots of <span class="math">\(f\)</span>,
+using the <code class="xref py py-func docutils literal"><span class="pre">roots()</span></code> function, substitute those roots for <span class="math">\(z\)</span> in <span class="math">\(g\)</span> and add
+resulting values together.</p>
+<p>Let’s consider the following polynomial and rational function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">z</span><span class="o">**</span><span class="mi">5</span> <span class="o">+</span> <span class="n">z</span> <span class="o">+</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span>
+<span class="go"> 5</span>
+<span class="go">z  + z + 3</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">z</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">1</span>
+<span class="go">─</span>
+<span class="go">z</span>
+</pre></div>
+</div>
+<p>Following the trivial approach, let’s compute the roots of <span class="math">\(f\)</span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">roots</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+<p>We got a very unfortunate result: no roots! By the fundamental theorem
+of algebra we should get five, possibly complex, roots, including
+multiplicities. Unfortunately, there is no way to express roots in terms
+of radicals of some polynomials of degree five and higher. For certain
+instances of polynomials of this kind it may be possible to compute
+their roots (e.g. <code class="xref py py-func docutils literal"><span class="pre">roots()</span></code> recognizes cyclotomic polynomials of
+high degree), but in general we will most likely be unlucky.</p>
+<p>Instead, we could switch to numerical root finding algorithms and compute
+approximations of roots of <span class="math">\(f\)</span> and proceed with summation of roots. This
+can be done by using <code class="xref py py-func docutils literal"><span class="pre">nroots()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">R</span> <span class="o">=</span> <span class="n">nroots</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ri</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">numbered_symbols</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">),</span> <span class="n">R</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">pprint</span><span class="p">(</span><span class="n">Eq</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="go">r₀ = -1.13299756588507</span>
+<span class="go">r₁ = -0.47538075666955 - 1.12970172509541⋅ⅈ</span>
+<span class="go">r₂ = -0.47538075666955 + 1.12970172509541⋅ⅈ</span>
+<span class="go">r₃ = 1.04187953961208 - 0.822870338109958⋅ⅈ</span>
+<span class="go">r₄ = 1.04187953961208 + 0.822870338109958⋅ⅈ</span>
+</pre></div>
+</div>
+<p>We can substitute those roots for <span class="math">\(z\)</span> in <span class="math">\(g\)</span> and add together:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">([</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span> <span class="p">])</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">chop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">-0.333333333333332</span>
+</pre></div>
+</div>
+<p>It was necessary to evaluate this sum with <code class="xref py py-func docutils literal"><span class="pre">evalf()</span></code>, because otherwise
+we would get an unsimplified result. The additional parameter <code class="docutils literal"><span class="pre">chop=True</span></code> was
+necessary to remove a tiny and insignificant imaginary part. Next we can use
+<code class="xref py py-func docutils literal"><span class="pre">nsimplify()</span></code> to get an exact result from numerical approximation:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nsimplify</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">-1/3</span>
+</pre></div>
+</div>
+<p>Is this result correct? The best way is to figure out a purely symbolic
+method that doesn’t require computing roots of <span class="math">\(f\)</span>. In SymPy it possible
+to represent a root of a univariate polynomial with rational coefficients
+using <code class="xref py py-class docutils literal"><span class="pre">RootOf</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootOf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">      ⎛ 5           ⎞</span>
+<span class="go">RootOf⎝z  + z + 3, 0⎠</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+<span class="go">-1.13299756588507</span>
+</pre></div>
+</div>
+<p>We can obtain all roots using list comprehensions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">R</span> <span class="o">=</span> <span class="p">[</span> <span class="n">RootOf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">degree</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">pprint</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">      ⎛ 5           ⎞</span>
+<span class="go">RootOf⎝z  + z + 3, 0⎠</span>
+<span class="go">      ⎛ 5           ⎞</span>
+<span class="go">RootOf⎝z  + z + 3, 1⎠</span>
+<span class="go">      ⎛ 5           ⎞</span>
+<span class="go">RootOf⎝z  + z + 3, 2⎠</span>
+<span class="go">      ⎛ 5           ⎞</span>
+<span class="go">RootOf⎝z  + z + 3, 3⎠</span>
+<span class="go">      ⎛ 5           ⎞</span>
+<span class="go">RootOf⎝z  + z + 3, 4⎠</span>
+</pre></div>
+</div>
+<p>Alternatively we can use <code class="docutils literal"><span class="pre">Poly(f).all_roots()</span></code> which gives the same
+result, but is much faster when <span class="math">\(f\)</span> is a composite polynomial, because
+the preprocessing step in <code class="xref py py-class docutils literal"><span class="pre">RootOf</span></code> is executed only once.</p>
+<p>Unfortunately we can’t get anywhere from here, because SymPy is not yet
+capable of simplifying expressions with <code class="xref py py-class docutils literal"><span class="pre">RootOf</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span> <span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">Add</span><span class="p">)</span>
+<span class="go">True</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">simplify</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">Add</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>We can, however, evaluate sums of <code class="xref py py-class docutils literal"><span class="pre">RootOf</span></code>’s using <code class="xref py py-func docutils literal"><span class="pre">evalf()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+<span class="go">-0.333333333333333</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nsimplify</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">-1/3</span>
+</pre></div>
+</div>
+<p>which gave us the same result as before. The difference is that now numerical
+approximations of roots of <span class="math">\(f\)</span> were computed using a hybrid symbolic–numeric
+method, where first disjoint isolating intervals (rectangles) where computed
+for all roots of <span class="math">\(f\)</span> and then a numerical root finding algorithm was used in
+each interval.</p>
+<p>Let’s approach this problem differently, using a purely symbolic
+approach. We know that a polynomial of degree <span class="math">\(n\)</span> has exactly <span class="math">\(n\)</span>
+complex roots, counting multiplicities. In our case <span class="math">\(f\)</span> has five roots:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">R</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s1">&#39;r:5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">R</span>
+<span class="go">(r₀, r₁, r₂, r₃, r₄)</span>
+</pre></div>
+</div>
+<p>Let’s now substitute those “roots” for <span class="math">\(z\)</span> in <span class="math">\(g\)</span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span> <span class="p">]</span>
+<span class="go">⎡1   1   1   1   1 ⎤</span>
+<span class="go">⎢──, ──, ──, ──, ──⎥</span>
+<span class="go">⎣r₀  r₁  r₂  r₃  r₄⎦</span>
+</pre></div>
+</div>
+<p>and add those expressions together:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">1    1    1    1    1</span>
+<span class="go">── + ── + ── + ── + ──</span>
+<span class="go">r₄   r₃   r₂   r₁   r₀</span>
+</pre></div>
+</div>
+<p>We got a sum of simple rational functions. The next step is to put those
+rational functions over a common denominator:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">together</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span>
+<span class="go">r₀⋅r₁⋅r₂⋅r₃ + r₀⋅r₁⋅r₂⋅r₄ + r₀⋅r₁⋅r₃⋅r₄ + r₀⋅r₂⋅r₃⋅r₄ + r₁⋅r₂⋅r₃⋅r₄</span>
+<span class="go">───────────────────────────────────────────────────────────────────</span>
+<span class="go">                           r₀⋅r₁⋅r₂⋅r₃⋅r₄</span>
+</pre></div>
+</div>
+<p>We got very peculiar numerator and denominator, which are very specific
+functions of roots of <span class="math">\(f\)</span> (symmetric polynomials). Polynomials of this
+kind can be generated using <code class="xref py py-func docutils literal"><span class="pre">viete()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">V</span> <span class="o">=</span> <span class="n">viete</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="ow">in</span> <span class="n">V</span><span class="p">:</span>
+<span class="go">....     pprint(Eq(lhs, rhs))</span>
+<span class="go">....</span>
+<span class="go">r₀ + r₁ + r₂ + r₃ + r₄ = 0</span>
+<span class="go">r₀⋅r₁ + r₀⋅r₂ + r₀⋅r₃ + r₀⋅r₄ + r₁⋅r₂ + r₁⋅r₃ + r₁⋅r₄ + r₂⋅r₃ + r₂⋅r₄ + r₃⋅r₄ = 0</span>
+<span class="go">r₀⋅r₁⋅r₂ + r₀⋅r₁⋅r₃ + r₀⋅r₁⋅r₄ + r₀⋅r₂⋅r₃ + r₀⋅r₂⋅r₄ + r₀⋅r₃⋅r₄ + r₁⋅r₂⋅r₃ + r₁⋅r₂⋅r₄ + r₁⋅r₃⋅r₄ + r₂⋅r₃⋅r₄ = 0</span>
+<span class="go">r₀⋅r₁⋅r₂⋅r₃ + r₀⋅r₁⋅r₂⋅r₄ + r₀⋅r₁⋅r₃⋅r₄ + r₀⋅r₂⋅r₃⋅r₄ + r₁⋅r₂⋅r₃⋅r₄ = 1</span>
+<span class="go">r₀⋅r₁⋅r₂⋅r₃⋅r₄ = -3</span>
+</pre></div>
+</div>
+<p>Viete formulas show the relationship between roots of a polynomial and
+its coefficients:</p>
+<div class="math">
+\[V_{i-1} = (-1)^i \frac{a_{n-i}}{a_n}\]</div>
+<p>where <span class="math">\(f(z)=a_nz^n + a_{n-1}z^{n-1} + \ldots + a_1z + a_0\)</span> and <span class="math">\(i = 1 \ldots n\)</span>. To obtain the final
+result it sufficient to take <span class="math">\(V_3\)</span> and <span class="math">\(V_4\)</span> and substitute in <span class="math">\(G\)</span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numer</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">/</span><span class="n">denom</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+<span class="go">-1/3</span>
+</pre></div>
+</div>
+<p>Or we could simply use <code class="docutils literal"><span class="pre">G.subs(V)</span></code>, but due to a bug in SymPy (<a class="reference external" href="http://code.google.com/p/sympy/issues/detail?id=2552">#2552</a>) this
+doesn’t work as expected, leaving the denominator unchanged.</p>
+<p>We obtained the same result as before, just this time using purely symbolic
+techniques. This simple procedure can be extended to form an algorithm for
+solving the root summation problem in the general setup. SymPy implements this
+algorithm in <code class="xref py py-class docutils literal"><span class="pre">RootSum</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootSum</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Lambda</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">))</span>
+<span class="go">-1/3</span>
+</pre></div>
+</div>
+<p>The choice of <span class="math">\(g\)</span> allowed us to recognize Viete formulas very easily in
+<span class="math">\(G\)</span>, but is this the case also for more complicated rational functions?
+Let’s modify <span class="math">\(g\)</span> a little:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">  1</span>
+<span class="go">─────</span>
+<span class="go">z + 2</span>
+</pre></div>
+</div>
+<p>Now let’s repeat the procedure for the new <span class="math">\(g\)</span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">together</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span> <span class="p">]))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">numer</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">denom</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>
+<span class="go">r₀⋅r₁⋅r₂⋅r₃ + r₀⋅r₁⋅r₂⋅r₄ + 4⋅r₀⋅r₁⋅r₂ + r₀⋅r₁⋅r₃⋅r₄ + 4⋅r₀⋅r₁⋅r₃ + 4⋅r₀⋅r₁⋅r₄ + 12⋅r₀⋅r₁ + r₀⋅r₂⋅r₃⋅r₄ + \</span>
+<span class="go">4⋅r₀⋅r₂⋅r₃ + 4⋅r₀⋅r₂⋅r₄ + 12⋅r₀⋅r₂ + 4⋅r₀⋅r₃⋅r₄ + 12⋅r₀⋅r₃ + 12⋅r₀⋅r₄ + 32⋅r₀ + r₁⋅r₂⋅r₃⋅r₄ + 4⋅r₁⋅r₂⋅r₃ + \</span>
+<span class="go">4⋅r₁⋅r₂⋅r₄ + 12⋅r₁⋅r₂ + 4⋅r₁⋅r₃⋅r₄ + 12⋅r₁⋅r₃ + 12⋅r₁⋅r₄ + 32⋅r₁ + 4⋅r₂⋅r₃⋅r₄ + 12⋅r₂⋅r₃ + 12⋅r₂⋅r₄ + 32⋅r₂ + \</span>
+<span class="go">12⋅r₃⋅r₄ + 32⋅r₃ + 32⋅r₄ + 80</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span>
+<span class="go">r₀⋅r₁⋅r₂⋅r₃⋅r₄ + 2⋅r₀⋅r₁⋅r₂⋅r₃ + 2⋅r₀⋅r₁⋅r₂⋅r₄ + 4⋅r₀⋅r₁⋅r₂ + 2⋅r₀⋅r₁⋅r₃⋅r₄ + 4⋅r₀⋅r₁⋅r₃ + 4⋅r₀⋅r₁⋅r₄ + \</span>
+<span class="go">8⋅r₀⋅r₁ + 2⋅r₀⋅r₂⋅r₃⋅r₄ + 4⋅r₀⋅r₂⋅r₃ + 4⋅r₀⋅r₂⋅r₄ + 8⋅r₀⋅r₂ + 4⋅r₀⋅r₃⋅r₄ + 8⋅r₀⋅r₃ + 8⋅r₀⋅r₄ + 16⋅r₀ + \</span>
+<span class="go">2⋅r₁⋅r₂⋅r₃⋅r₄ + 4⋅r₁⋅r₂⋅r₃ + 4⋅r₁⋅r₂⋅r₄ + 8⋅r₁⋅r₂ + 4⋅r₁⋅r₃⋅r₄ + 8⋅r₁⋅r₃ + 8⋅r₁⋅r₄ + 16⋅r₁ + 4⋅r₂⋅r₃⋅r₄ + \</span>
+<span class="go">8⋅r₂⋅r₃ + 8⋅r₂⋅r₄ + 16⋅r₂ + 8⋅r₃⋅r₄ + 16⋅r₃ + 16⋅r₄ + 32</span>
+</pre></div>
+</div>
+<p>This doesn’t look that familiar anymore. Let’s try to apply Viete formulas
+to the numerator and denominator:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">V</span><span class="p">)</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="o">*</span><span class="n">R</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">V</span><span class="p">)</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="o">*</span><span class="n">R</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>We weren’t able to get rid of the symbolic roots of <span class="math">\(f\)</span>. We can, however, try
+to rewrite <span class="math">\(p\)</span> and <span class="math">\(q\)</span> as polynomials in elementary symmetric polynomials.
+This procedure is called symmetric reduction, and an algorithm for this is
+implemented in <code class="xref py py-func docutils literal"><span class="pre">symmetrize()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">Q</span><span class="p">),</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="n">R</span><span class="p">,</span> <span class="n">formal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">P</span>
+<span class="go">(32⋅s₁ + 12⋅s₂ + 4⋅s₃ + s₄ + 80, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Q</span>
+<span class="go">(16⋅s₁ + 8⋅s₂ + 4⋅s₃ + 2⋅s₄ + s₅ + 32, 0)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">pprint</span><span class="p">(</span><span class="n">Eq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">poly</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="go">s₁ = r₀ + r₁ + r₂ + r₃ + r₄</span>
+<span class="go">s₂ = r₀⋅r₁ + r₀⋅r₂ + r₀⋅r₃ + r₀⋅r₄ + r₁⋅r₂ + r₁⋅r₃ + r₁⋅r₄ + r₂⋅r₃ + r₂⋅r₄ + r₃⋅r₄</span>
+<span class="go">s₃ = r₀⋅r₁⋅r₂ + r₀⋅r₁⋅r₃ + r₀⋅r₁⋅r₄ + r₀⋅r₂⋅r₃ + r₀⋅r₂⋅r₄ + r₀⋅r₃⋅r₄ + r₁⋅r₂⋅r₃ + r₁⋅r₂⋅r₄ + r₁⋅r₃⋅r₄ + r₂⋅r₃⋅r₄</span>
+<span class="go">s₄ = r₀⋅r₁⋅r₂⋅r₃ + r₀⋅r₁⋅r₂⋅r₄ + r₀⋅r₁⋅r₃⋅r₄ + r₀⋅r₂⋅r₃⋅r₄ + r₁⋅r₂⋅r₃⋅r₄</span>
+<span class="go">s₅ = r₀⋅r₁⋅r₂⋅r₃⋅r₄</span>
+</pre></div>
+</div>
+<p>Here we performed the formal simultaneous symmetric reduction of the polynomials <span class="math">\(p\)</span>
+and <span class="math">\(q\)</span>, obtaining their representation in terms of elementary symmetric
+polynomials, non-symmetric remainders, and elementary symmetric polynomials.
+Remainders are always zero for symmetric inputs.</p>
+<p>We can zip this mapping and Viete formulas together, obtaining:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span> <span class="p">]</span>
+<span class="go">[(s₁, 0), (s₂, 0), (s₃, 0), (s₄, 1), (s₅, -3)]</span>
+</pre></div>
+</div>
+<p>Now we can take head of <code class="docutils literal"><span class="pre">P</span></code> and <code class="docutils literal"><span class="pre">Q</span></code> and perform substitution:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">/</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">81</span>
+<span class="go">──</span>
+<span class="go">31</span>
+</pre></div>
+</div>
+<p>Let’s verify this result using <code class="xref py py-class docutils literal"><span class="pre">RootSum</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootSum</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Lambda</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">))</span>
+<span class="go">81</span>
+<span class="go">──</span>
+<span class="go">31</span>
+</pre></div>
+</div>
+<p>The numerical approach also works in this case:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">([</span> <span class="n">g</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">Poly</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">all_roots</span><span class="p">()</span> <span class="p">])</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+<span class="go">2.61290322580645</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nsimplify</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">81</span>
+<span class="go">──</span>
+<span class="go">31</span>
+</pre></div>
+</div>
+<div class="section" id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Repeat this procedure for:</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math">\(f = z^5 + z + a\)</span> and <span class="math">\(g = \frac{1}{z + 1}\)</span></li>
+<li><span class="math">\(f = z^5 + z + a\)</span> and <span class="math">\(g = \frac{1}{z + b}\)</span></li>
+</ul>
+<p>(<a class="reference internal" href="extras.html#solution-rootsum-1"><span class="std std-ref">solution</span></a>)</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>Can this or a similar procedure be used with other classes of expressions
+than rational functions? If so, what kind of expressions can be allowed?</li>
+</ol>
+<blockquote>
+<div>(<a class="reference internal" href="extras.html#solution-rootsum-2"><span class="std std-ref">solution</span></a>)</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sympylogo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Summing roots of polynomials</a><ul>
+<li><a class="reference internal" href="#tasks">Tasks</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="mathematics.html">Mathematical problem solving with SymPy</a><ul>
+      <li>Previous: <a href="numerics.html" title="previous chapter">Not only symbolics: numerical computing</a></li>
+      <li>Next: <a href="groebner.html" title="next chapter">Applications of |groebner| bases</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/summation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015 SymPy Development Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/summation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

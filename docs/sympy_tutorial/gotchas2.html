@@ -1,0 +1,516 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Gotchas and pitfalls &#8212; PyCon 2015 SymPy Tutorial  documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://live.sympy.org/static/live-core.css" type="text/css" />
+    <link rel="stylesheet" href="http://live.sympy.org/static/live-autocomplete.css" type="text/css" />
+    <link rel="stylesheet" href="http://live.sympy.org/static/live-sphinx.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/utilities.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/external/classy.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/live-core.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/live-autocomplete.js"></script>
+    <script type="text/javascript" src="http://live.sympy.org/static/live-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/SymPy-Favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Setting up and using printers" href="printers.html" />
+    <link rel="prev" title="Basics of expressions in SymPy" href="basics.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gotchas-and-pitfalls">
+<h1>Gotchas and pitfalls<a class="headerlink" href="#gotchas-and-pitfalls" title="Permalink to this headline">¶</a></h1>
+<p>SymPy is being written in and runs under <a class="reference external" href="http://www.python.org/">Python</a>,
+a general purpose programming language, so there are a few things that may
+be quite different from what can be experienced in other symbolic mathematics
+or computer algebra systems like Maple or Mathematica. These are some of the
+gotchas and pitfalls that you may encounter when using SymPy.</p>
+<div class="section" id="is-not-a-rational-number">
+<h2><code class="docutils literal"><span class="pre">1/3</span></code> is not a rational number<a class="headerlink" href="#is-not-a-rational-number" title="Permalink to this headline">¶</a></h2>
+<p>Users of classical symbolic mathematics systems like Maple or Mathematica,
+are accustomed to typing <code class="docutils literal"><span class="pre">1/3</span></code> and get the rational number one over three. In
+SymPy this gives either <code class="docutils literal"><span class="pre">0</span></code> or a floating point number, depending on whether
+we use old or new division. This is considered most disturbing difference
+between SymPy and other mathematical systems.</p>
+<p>First, this strange behavior comes from the fact that Python is a
+general purpose programming language  and for a very long time it didn’t
+have support for rational numbers in the standard library. This changed
+in Python 2.6, where the <code class="xref py py-class docutils literal"><span class="pre">Fraction</span></code> class was introduced, but it would
+be anyway unusual for Python to make <code class="docutils literal"><span class="pre">/</span></code> return a rational number.</p>
+<p>To construct a rational number in SymPy, one can use <code class="xref py py-class docutils literal"><span class="pre">Rational</span></code>
+class:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span>
+<span class="go">1/3</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">&lt;class &#39;sympy.core.numbers.Rational&#39;&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">0.333333333333</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+<span class="go">0.333333333333333</span>
+</pre></div>
+</div>
+<p>There are also other ways:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Integer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span>
+<span class="go">1/3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">S</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span>
+<span class="go">1/3</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">S</span></code> is SymPy’s registry of singletons. It implements the <code class="docutils literal"><span class="pre">__call__</span></code> method,
+which is a shorthand for <code class="xref py py-func docutils literal"><span class="pre">sympify()</span></code>. Using <code class="docutils literal"><span class="pre">S</span></code> is the most concise
+way to construct rational numbers. The last way is to pass a string with
+<code class="docutils literal"><span class="pre">1/3</span></code> to <code class="xref py py-func docutils literal"><span class="pre">sympify()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sympify</span><span class="p">(</span><span class="s2">&quot;1/3&quot;</span><span class="p">)</span>
+<span class="go">1/3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">&lt;class &#39;sympy.core.numbers.Rational&#39;&gt;</span>
+</pre></div>
+</div>
+<p><code class="xref py py-func docutils literal"><span class="pre">sympify()</span></code> implements a <code class="xref py py-mod docutils literal"><span class="pre">tokenize</span></code>–based preparser that puts
+Python’s numeric types in envelopes consisting of SymPy’s numeric class
+constructors.</p>
+<p>You can also avoid this problem by not typing <code class="docutils literal"><span class="pre">int/int</span></code> when other
+terms are involved. For example, write <code class="docutils literal"><span class="pre">2*x/3</span></code> instead of <code class="docutils literal"><span class="pre">2/3*x</span></code>.
+And you can type <code class="docutils literal"><span class="pre">sqrt(x)</span></code> instead of <code class="docutils literal"><span class="pre">x**Rational(1,</span> <span class="pre">2)</span></code>, as the
+two are equivalent.</p>
+</div>
+<div class="section" id="is-not-exponentiation-operator">
+<h2><code class="docutils literal"><span class="pre">^</span></code> is not exponentiation operator<a class="headerlink" href="#is-not-exponentiation-operator" title="Permalink to this headline">¶</a></h2>
+<p>SymPy uses the same default arithmetic operators as Python. Most of these,
+like <code class="docutils literal"><span class="pre">+</span></code>, <code class="docutils literal"><span class="pre">-</span></code>, <code class="docutils literal"><span class="pre">*</span></code> and <code class="docutils literal"><span class="pre">/</span></code>, are standard. There are, however, some
+differences when comparing SymPy to standalone mathematical systems. One
+of the differences is lack of implied multiplication, to which Mathematica
+users may be accustomed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span><span class="o">*</span><span class="n">x</span>
+<span class="go">2*x</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span><span class="n">x</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">SyntaxError</span>: <span class="n">invalid syntax</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span> <span class="n">x</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">SyntaxError</span>: <span class="n">invalid syntax</span>
+</pre></div>
+</div>
+<p>More importantly, Python uses <code class="docutils literal"><span class="pre">**</span></code> to denote exponentiation, whereas
+other mathematical systems use <code class="docutils literal"><span class="pre">^</span></code> operator. Notable exceptions to
+this rule are Axiom and Maple, which allow both, though most users may
+not be aware of this. For example in Mathematica, <code class="docutils literal"><span class="pre">**</span></code> operator is
+used for non-commutative multiplication. So in Sympy the following
+expression is perfectly valid:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="go">       2</span>
+<span class="go">(x + 1)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">&lt;class &#39;sympy.core.power.Pow&#39;&gt;</span>
+</pre></div>
+</div>
+<p>but using <code class="docutils literal"><span class="pre">^</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">unsupported operand type(s) for ^: &#39;Add&#39; and &#39;int&#39;</span>
+</pre></div>
+</div>
+<p>gives use <code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code>. For users’ convenience, <code class="xref py py-func docutils literal"><span class="pre">sympify()</span></code> converts
+<code class="docutils literal"><span class="pre">^</span></code> to <code class="docutils literal"><span class="pre">**</span></code> by default in a string:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sympify</span><span class="p">(</span><span class="s2">&quot;(x + 1)^2&quot;</span><span class="p">)</span>
+<span class="go">       2</span>
+<span class="go">(x + 1)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">&lt;class &#39;sympy.core.power.Pow&#39;&gt;</span>
+</pre></div>
+</div>
+<p>People who what pure Python behavior of <code class="xref py py-func docutils literal"><span class="pre">sympify()</span></code> can disable this
+automatic conversion by passing <code class="docutils literal"><span class="pre">convert_xor=False</span></code> to it.</p>
+</div>
+<div class="section" id="is-not-comparison-operator">
+<h2><code class="docutils literal"><span class="pre">=</span></code> is not comparison operator<a class="headerlink" href="#is-not-comparison-operator" title="Permalink to this headline">¶</a></h2>
+<p>The equals sign (<code class="docutils literal"><span class="pre">=</span></code>) is the assignment operator in Python, not equality
+operator. In other many mathematical systems, <code class="docutils literal"><span class="pre">=</span></code> is used for comparing
+values and/or for constructing equalities, but with SymPy you have to use
+<code class="docutils literal"><span class="pre">==</span></code> for the former and <code class="docutils literal"><span class="pre">Eq(x,</span> <span class="pre">y)</span></code> for the later. Note that instances
+of <code class="xref py py-class docutils literal"><span class="pre">Eq</span></code> class, in boolean context, collapse to <code class="docutils literal"><span class="pre">==</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="p">(</span><span class="s1">&#39;x,y&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span>
+<span class="go">False</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">x = y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">_</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="why-you-shouldn-t-write-10-1000">
+<h2>Why you shouldn’t write <code class="docutils literal"><span class="pre">10**-1000</span></code><a class="headerlink" href="#why-you-shouldn-t-write-10-1000" title="Permalink to this headline">¶</a></h2>
+<p>Symbolic mathematics systems are expected to work with expressions of
+arbitrary size, limited only by the size of available memory. Python
+supports arbitrary precision integers by default, but allows only fixed
+precision floats. Thus you can write:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">10</span><span class="o">**-</span><span class="mi">10</span>
+<span class="go">1e-10</span>
+</pre></div>
+</div>
+<p>but:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">10</span><span class="o">**-</span><span class="mi">1000</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+<p>is not what we expect. To overcome this, we have to make the base an
+instance of SymPy’s floating point type:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Float</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span><span class="o">**-</span><span class="mi">1000</span>
+<span class="go">1.00000000000000e-1000</span>
+</pre></div>
+</div>
+<p>Note that we can’t write simply <code class="docutils literal"><span class="pre">Float(10)</span></code>, because SymPy automatically
+converts this to an instance of <code class="xref py py-class docutils literal"><span class="pre">Integer</span></code> class and thus:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">**-</span><span class="mi">1000</span><span class="p">)</span>
+<span class="go">&lt;class &#39;sympy.core.numbers.Rational&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Of course we could issue:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">**-</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+<span class="go">1.00000000000000e-1000</span>
+</pre></div>
+</div>
+<p>but this it is neither readable, nor efficient.</p>
+<p>You can also pass the entire number as a string to <code class="xref py py-class docutils literal"><span class="pre">Float</span></code>. If you
+do this, you must use the scientific notation syntax:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Float</span><span class="p">(</span><span class="s2">&quot;1e-1000&quot;</span><span class="p">)</span>
+<span class="go">1.00000000000000e-1000</span>
+</pre></div>
+</div>
+<p>Finally, we note that it is preferable to use exact (i.e., rational)
+numbers when the values of the numbers are exactly known. Many parts of
+SymPy work better when rational numbers are used instead of floating
+point numbers. This is because rational numbers do not suffer from some
+of the problems of floating point numbers, like rounding errors.</p>
+<p>This is especially the case for exponents:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">factor</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">x**2.0 - 1</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factor</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">(x - 1)*(x + 1)</span>
+</pre></div>
+</div>
+<p>The first expression is not factored because the factorization only
+holds for the exponent of <span class="math">\(2\)</span> <em>exactly</em>. This problem can also come
+up when using floating point coefficients:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">solve</span><span class="p">([</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+<span class="go">[(-2, -2), (0, 0)]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solve</span><span class="p">([</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">DomainError</span>: <span class="n">can&#39;t compute a Groebner basis over RR</span>
+</pre></div>
+</div>
+<p>Here, the algorithm for solving systems of polynomial equations relies
+on computing a <a href="#id9"><span class="problematic" id="id10">|groebner|</span></a> basis (see the <a class="reference internal" href="groebner.html#groebner-bases"><span class="std std-ref">Applications of |groebner| bases</span></a> section
+below for more information on these). But the algorithm for computing
+this currently does not support floating point coefficients, so
+<code class="xref py py-func docutils literal"><span class="pre">solve()</span></code> fails in that case.</p>
+</div>
+<div class="section" id="how-to-deal-with-limited-recursion-depth">
+<h2>How to deal with limited recursion depth<a class="headerlink" href="#how-to-deal-with-limited-recursion-depth" title="Permalink to this headline">¶</a></h2>
+<p>Very often algorithms in symbolic mathematics and computer algebra are
+highly recursive in nature. This can be a problem even for relatively
+small inputs in SymPy, because Python interpreters set a limit on the
+depth of recursion. Suppose we want to compute, manipulate and print the
+following function composition:</p>
+<div class="math">
+\[\underbrace{(f \circ f \circ \ldots \circ f)}_{1000}(x)\]</div>
+<p>Computing this isn’t a problem:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Symbol</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">x</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">u</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="gp">...</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="go">f</span>
+</pre></div>
+</div>
+<p>However, if we try to get the number of all subexpressions of <code class="docutils literal"><span class="pre">u</span></code> that
+contain <code class="docutils literal"><span class="pre">f</span></code>, we get the following error:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">RuntimeError</span>: <span class="n">maximum recursion depth exceeded while calling a Python object</span>
+</pre></div>
+</div>
+<p>The same happens when we try to print <code class="docutils literal"><span class="pre">u</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span> <span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">RuntimeError</span>: <span class="n">maximum recursion depth exceeded while calling a Python object</span>
+</pre></div>
+</div>
+<p>Python provides, at least partially, a solution to this problem by
+allowing the user to relax the limit on recursion depth:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="mi">1050</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+<span class="go">1000</span>
+</pre></div>
+</div>
+<p>To print <code class="docutils literal"><span class="pre">u</span></code> we have to relax the limit even more:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span> <span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">RuntimeError</span>: <span class="n">maximum recursion depth exceeded while calling a Python object</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="mi">5500</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span> <span class="p">])</span>
+<span class="go">1000</span>
+</pre></div>
+</div>
+<p>This should be a warning about the fact that often it is possible to
+perform computations with highly nested expressions, but it is not
+possible to print those expressions without relaxing the recursion depth
+limit. SymPy never uses <code class="docutils literal"><span class="pre">sys.setrecursionlimit</span></code> automatically, so
+it’s users responsibility to relax the limit whenever needed.</p>
+<p>Unless you are using a highly nested expression like the one above, you
+generally won’t encounter this problem, as the default limit of 1000 is
+generally high enough for the most common expressions.</p>
+</div>
+<div class="section" id="expression-caching-and-its-consequences">
+<h2>Expression caching and its consequences<a class="headerlink" href="#expression-caching-and-its-consequences" title="Permalink to this headline">¶</a></h2>
+<p>To improve speed of computations, SymPy by default caches all intermediate
+subexpressions. The difference is easily visible when running tests:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ :input:`SYMPY_USE_CACHE=yes bin/test sympy/integrals/tests/test_risch.py`
+============================= test process starts ==============================
+executable:   /usr/bin/python2.6  (2.6.6-final-0)
+architecture: 64-bit
+ground types: gmpy
+
+sympy/integrals/tests/test_risch.py[20] .....ffff...........                [OK]
+
+======= tests finished: 16 passed, 4 expected to fail, in 28.18 seconds ========
+
+$ :input:`SYMPY_USE_CACHE=no bin/test sympy/integrals/tests/test_risch.py`
+============================= test process starts ==============================
+executable:   /usr/bin/python2.6  (2.6.6-final-0)
+architecture: 64-bit
+ground types: gmpy
+
+sympy/integrals/tests/test_risch.py[20] .....ffff...........                [OK]
+
+======= tests finished: 16 passed, 4 expected to fail, in 64.82 seconds ========
+</pre></div>
+</div>
+<p>(note the time needed to run the tests at the end of the each test run)
+and in interactive sessions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ :input:`bin/isympy -q`
+IPython console for SymPy 0.7.1 (Python 2.7.1-64-bit) (ground types: gmpy)
+
+In [1]: f = (x-tan(x)) / tan(x)**2 + tan(x)
+
+In [2]: %time integrate(f, x);
+CPU times: user 0.46 s, sys: 0.00 s, total: 0.46 s
+Wall time: 0.49 s
+
+In [4]: %time integrate(f, x);
+CPU times: user 0.24 s, sys: 0.00 s, total: 0.24 s
+Wall time: 0.25 s
+
+$ :input:`bin/isympy -q -C`
+IPython console for SymPy 0.7.1 (Python 2.7.1-64-bit) (ground types: gmpy, cache: off)
+
+In [1]: f = (x-tan(x)) / tan(x)**2 + tan(x)
+
+In [2]: %time integrate(f, x);
+CPU times: user 1.82 s, sys: 0.00 s, total: 1.82 s
+Wall time: 1.84 s
+
+In [4]: %time integrate(f, x);
+CPU times: user 1.82 s, sys: 0.00 s, total: 1.82 s
+Wall time: 1.83 s
+</pre></div>
+</div>
+<p>(<code class="docutils literal"><span class="pre">-C</span></code> is equivalent to setting <code class="docutils literal"><span class="pre">SYMPY_USE_CACHE=&quot;no&quot;</span></code>).</p>
+<p>The main consequence of caching is that SymPy can use a lot of resources
+in certain situations. One can use <code class="xref py py-func docutils literal"><span class="pre">clear_cache()</span></code> to reduce memory
+consumption:</p>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">sympy.core.cache</span> <span class="kn">import</span> <span class="n">clear_cache</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="n">clear_cache</span><span class="p">()</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="o">%</span><span class="k">time</span> integrate(f, x);
+<span class="n">CPU</span> <span class="n">times</span><span class="p">:</span> <span class="n">user</span> <span class="mf">0.46</span> <span class="n">s</span><span class="p">,</span> <span class="n">sys</span><span class="p">:</span> <span class="mf">0.00</span> <span class="n">s</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="mf">0.46</span> <span class="n">s</span>
+<span class="n">Wall</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.47</span> <span class="n">s</span>
+</pre></div>
+</div>
+<p>As caching influences computation times, any benchmarking must be performed
+with cache off. Otherwise those measurements will be either inaccurate or
+completely wrong (measuring how fast SymPy can retrieve data from cache,
+rather than actual computing times):</p>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span>$ bin/isympy -q
+IPython console for SymPy 0.7.1 (Python 2.7.1-64-bit) (ground types: gmpy)
+
+In [1]: %timeit sin(2*pi);
+10000 loops, best of 3: 28.7 us per loop
+
+$ bin/isympy -q -C
+IPython console for SymPy 0.7.1 (Python 2.7.1-64-bit) (ground types: gmpy, cache: off)
+
+In [1]: %timeit sin(2*pi);
+100 loops, best of 3: 2.75 ms per loop
+</pre></div>
+</div>
+<p>The difference between using and not using cache is two orders of magnitude.</p>
+</div>
+<div class="section" id="naming-convention-of-trigonometric-inverses">
+<h2>Naming convention of trigonometric inverses<a class="headerlink" href="#naming-convention-of-trigonometric-inverses" title="Permalink to this headline">¶</a></h2>
+<p>SymPy uses different names than most computer algebra systems for some
+of the commonly used elementary functions. In particular, the inverse
+trigonometric and hyperbolic functions use Python’s naming convention,
+so we have <code class="xref py py-func docutils literal"><span class="pre">asin()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">asinh()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">acos()</span></code> and so on, instead
+of <code class="xref py py-func docutils literal"><span class="pre">arcsin()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">arcsinh()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">arccos()</span></code>, etc.</p>
+</div>
+<div class="section" id="container-indices-start-at-zero">
+<h2>Container indices start at zero<a class="headerlink" href="#container-indices-start-at-zero" title="Permalink to this headline">¶</a></h2>
+<p>It should be obvious for people using Python, even for beginners, that when
+indexing containers like <code class="docutils literal"><span class="pre">list</span></code> or <code class="docutils literal"><span class="pre">tuple</span></code>, indexes start at zero, not
+one:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">L</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x:5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">L</span>
+<span class="go">(x₀, x₁, x₂, x₃, x₄)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">x₀</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">x₁</span>
+</pre></div>
+</div>
+<p>This is a common thing in general purpose programming languages. However,
+most symbolic mathematics systems, especially those which invent their own
+mathematical programming language, use <span class="math">\(1\)</span>–based indexing, sometimes reserving
+the <span class="math">\(0\)</span>–th index for special purpose (e.g. head of expressions in Mathematica).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sympylogo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Gotchas and pitfalls</a><ul>
+<li><a class="reference internal" href="#is-not-a-rational-number"><code class="docutils literal"><span class="pre">1/3</span></code> is not a rational number</a></li>
+<li><a class="reference internal" href="#is-not-exponentiation-operator"><code class="docutils literal"><span class="pre">^</span></code> is not exponentiation operator</a></li>
+<li><a class="reference internal" href="#is-not-comparison-operator"><code class="docutils literal"><span class="pre">=</span></code> is not comparison operator</a></li>
+<li><a class="reference internal" href="#why-you-shouldn-t-write-10-1000">Why you shouldn’t write <code class="docutils literal"><span class="pre">10**-1000</span></code></a></li>
+<li><a class="reference internal" href="#how-to-deal-with-limited-recursion-depth">How to deal with limited recursion depth</a></li>
+<li><a class="reference internal" href="#expression-caching-and-its-consequences">Expression caching and its consequences</a></li>
+<li><a class="reference internal" href="#naming-convention-of-trigonometric-inverses">Naming convention of trigonometric inverses</a></li>
+<li><a class="reference internal" href="#container-indices-start-at-zero">Container indices start at zero</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="introduction.html">Introduction to SymPy</a><ul>
+      <li>Previous: <a href="basics.html" title="previous chapter">Basics of expressions in SymPy</a></li>
+      <li>Next: <a href="printers.html" title="next chapter">Setting up and using printers</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gotchas2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015 SymPy Development Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/gotchas2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
