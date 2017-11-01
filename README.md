@@ -8,6 +8,12 @@ PyCon India -  SymPy & SymEngine
 
 * [In sympy/wiki](https://github.com/sympy/sympy/wiki/PyCon-India-2017-Proposal)
 
+## Slides for the workshop:
+
+[Link for the slide](https://shekharrajak.github.io/PyCon-SymPy-SymEngine/slides-pyconindia2017)
+
 ## SymPy tutorial :
 
 You can download the tutorials from [here](https://github.com/Shekharrajak/PyConIndiaSymPyTutorial/archive/master.zip)
+
+
