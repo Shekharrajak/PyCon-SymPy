@@ -8,8 +8,6 @@ PyCon India -  SymPy & SymEngine
 
 * [In sympy/wiki](https://github.com/sympy/sympy/wiki/PyCon-India-2017-Proposal)
 
-## About SymPy & SymEngine
+## SymPy tutorial :
 
-SymPy is a pure Python library for symbolic mathematics. It aims to become a full-featured computer algebra system (CAS) while keeping the code as simple as possible in order to be comprehensible and easily extensible. SymPy is written entirely in Python and does not require any external library.
-
-SymEngine is a standalone fast C++ symbolic manipulation library. Optional thin wrappers allow usage of the library from other languages.
+You can download the tutorials from [here](https://github.com/Shekharrajak/PyConIndiaSymPyTutorial/archive/master.zip)
