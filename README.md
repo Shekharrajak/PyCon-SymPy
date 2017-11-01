@@ -16,4 +16,5 @@ PyCon India -  SymPy & SymEngine
 
 You can download the tutorials from [here](https://github.com/Shekharrajak/PyConIndiaSymPyTutorial/archive/master.zip)
 
+[Online view in jupyter](http://nbviewer.jupyter.org/github/Shekharrajak/PyCon-SymPy-SymEngine/tree/master/SymPy_material/tutorial_exercises/)
 
